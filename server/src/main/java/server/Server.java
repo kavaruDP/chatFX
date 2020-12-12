@@ -18,10 +18,9 @@ public class Server {
     public Server()  {
         clients = new CopyOnWriteArrayList<>();
         if (!SQLHandler.connect()) {
-            SQLHandler.isAuthDBmethodOK = false;
-
             throw new RuntimeException("Не удалось подключиться к БД");
         }
+        //Видоизмененный метод с возможностью начитывать данные из БД и обновлять в ней ник.
         authService = new SimpleAuthService();
 //        authService = new DBAuthService();
         try {
