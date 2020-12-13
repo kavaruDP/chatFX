@@ -1,8 +1,12 @@
 package org.example;
 
+import java.io.*;
 import java.sql.*;
 
+//Класс в ДЗ не используется, создан исключительно для отладки.
+
 public class MainApp {
+
     private static Connection connection;
     private static Statement stmt;
     private static PreparedStatement psInsert;
@@ -14,15 +18,27 @@ public class MainApp {
     }
 
     public static void main(String[] args) {
-        try {
-            connect();
-            //clearTable();
-            //exRollback();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            disconnect();
-        }
+
+//        try {
+//            InputStreamReader in = new InputStreamReader(new FileInputStream(""), StandardCharsets.UTF_8);
+//            int x;
+//            while ((x= in.read()) != -1) {
+//                System.out.print((char) x);
+//            }
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        try {
+//            connect();
+//            //clearTable();
+//            //exRollback();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+//            disconnect();
+//        }
     }
 
     public static void exRollback() throws SQLException {
@@ -63,12 +79,12 @@ public class MainApp {
     }
 
     public static void prepareStatements() throws SQLException {
-        psInsert = connection.prepareStatement("INSERT INTO users (username, nikname) VALUES(?, ?);");
+        psInsert = connection.prepareStatement("INSERT INTO users (username, nickname) VALUES(?, ?);");
     }
 
     // CRUD create read update delete
     public void exSelect() throws SQLException {
-        ResultSet rs = stmt.executeQuery("SELECT username, nikname FROM users WHERE id>1;");
+        ResultSet rs = stmt.executeQuery("SELECT username, nickname FROM users WHERE id>1;");
 
         while (rs.next()) {
             System.out.println(rs.getString("name") + " " + rs.getInt("score"));
@@ -86,7 +102,7 @@ public class MainApp {
     }
 
     public void exUpdate() throws SQLException {
-        stmt.executeUpdate("UPDATE users SET nikname='test' WHERE id=2;");
+        stmt.executeUpdate("UPDATE users SET nickname='test' WHERE id=2;");
     }
 
     public void exInsert1() throws SQLException {
@@ -97,13 +113,13 @@ public class MainApp {
     public static void disconnect() {
         try {
             stmt.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
         }
         try {
             connection.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
         }
     }
 

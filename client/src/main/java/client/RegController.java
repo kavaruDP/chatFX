@@ -34,4 +34,6 @@ public class RegController {
     public void addMessage(String msg) {
         textArea.appendText(msg + "\n");
     }
+
+
 }
