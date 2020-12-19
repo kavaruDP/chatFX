@@ -5,8 +5,9 @@ package server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.*;
 
 public class Server {
     private ServerSocket server;
@@ -14,9 +15,17 @@ public class Server {
     private final int PORT = 8189;
     private List<ClientHandler> clients;
     private AuthService authService;
+    private ExecutorService executorService;
+
+
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
 
     public Server()  {
         clients = new CopyOnWriteArrayList<>();
+        executorService = Executors.newCachedThreadPool();
+
         if (!SQLHandler.connect()) {
             throw new RuntimeException("Не удалось подключиться к БД");
         }

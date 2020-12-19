@@ -19,8 +19,6 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.net.Socket;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.StandardOpenOption;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -48,12 +46,9 @@ public class Controller implements Initializable {
 
     private boolean authenticated;
     private String nickname;
-    private String login;
     private Stage stage;
     private Stage regStage;
-    private Stage hstStage;
     private RegController regController;
-    private RegController hstController;
     private BufferedWriter writer;
 
     public void setAuthenticated(boolean authenticated) {
@@ -143,8 +138,6 @@ public class Controller implements Initializable {
                         writer = new BufferedWriter(new FileWriter(fileName,true));
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
                     }
                     //OutputStreamWriter writeAppend = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(fileName)), StandardCharsets.UTF_8);
                     //-----------------------------------------------------------------------------
@@ -183,6 +176,7 @@ public class Controller implements Initializable {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+
                     try {
                         socket.close();
                     } catch (IOException e) {
