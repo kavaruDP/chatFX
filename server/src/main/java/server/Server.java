@@ -47,6 +47,7 @@ public class Server {
         } finally {
             SQLHandler.disconnect();
             System.out.println("server closed");
+            executorService.shutdown();
             try {
                 server.close();
             } catch (IOException e) {
