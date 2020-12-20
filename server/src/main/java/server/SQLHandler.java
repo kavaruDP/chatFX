@@ -9,8 +9,7 @@ public class SQLHandler {
     private static PreparedStatement psGetNickname;
     private static PreparedStatement psRegistration;
     private static PreparedStatement psChangeNick;
-    public static boolean isAuthDBmethodOK = true;
-    private static List<String> users;
+
 
     public static boolean connect() {           //throws SQLException, ClassNotFoundException
         try {
@@ -23,11 +22,9 @@ public class SQLHandler {
             connection.setAutoCommit(true);
             return true;
         } catch (SQLException e) {
-            isAuthDBmethodOK = false;
             e.printStackTrace();
             return false;
         } catch (ClassNotFoundException e) {
-            isAuthDBmethodOK = false;
             e.printStackTrace();
             return false;
         }
@@ -62,6 +59,7 @@ public class SQLHandler {
         }
     }
 
+    //Тестовый метод в качестве альтернативы использования prepareStatement.
     public static boolean registration2(String login, String password, String nickname) {
         try {
             String sql = "INSERT INTO users(login, password, nickname) VALUES ('" + login + "','" + password + "','" + nickname + "');" ;
@@ -85,7 +83,7 @@ public class SQLHandler {
     }
 
     public static List getUsersFromDB() {
-        users = new ArrayList<>();
+        List<String> users = new ArrayList<>();
         try {
             ResultSet rs = stmt.executeQuery("SELECT login, password, nickname FROM users;");
             while (rs.next()) {
@@ -127,7 +125,7 @@ public class SQLHandler {
         //System.out.println(registration2("jon6","jon","Джон6"));
         //System.out.println(getNicknameByLoginAndPassword("bob","bob"));
         //System.out.println(changeNick("Джон2","Джон3"));
-
+        disconnect();
     }
 
 }

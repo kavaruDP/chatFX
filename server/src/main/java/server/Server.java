@@ -5,8 +5,9 @@ package server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.*;
 
 public class Server {
     private ServerSocket server;
@@ -14,14 +15,21 @@ public class Server {
     private final int PORT = 8189;
     private List<ClientHandler> clients;
     private AuthService authService;
+    private ExecutorService executorService;
+
+
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
 
     public Server()  {
         clients = new CopyOnWriteArrayList<>();
-        if (!SQLHandler.connect()) {
-            SQLHandler.isAuthDBmethodOK = false;
+        executorService = Executors.newCachedThreadPool();
 
+        if (!SQLHandler.connect()) {
             throw new RuntimeException("Не удалось подключиться к БД");
         }
+        //Видоизмененный метод с возможностью начитывать данные из БД и обновлять в ней ник.
         authService = new SimpleAuthService();
 //        authService = new DBAuthService();
         try {
@@ -39,6 +47,7 @@ public class Server {
         } finally {
             SQLHandler.disconnect();
             System.out.println("server closed");
+            executorService.shutdown();
             try {
                 server.close();
             } catch (IOException e) {
