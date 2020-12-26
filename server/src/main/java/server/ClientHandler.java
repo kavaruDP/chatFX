@@ -5,23 +5,37 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class ClientHandler {
     private Server server;
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
-
+    private static final Logger logger = Logger.getLogger(ClientHandler.class.getName());
     private String nickname;
     private String login;
 
     public ClientHandler(Server server, Socket socket) {
+
+//        Handler fileHandler = null;
+//        try {
+//            fileHandler = new FileHandler("logs/server.log",true);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        logger.addHandler(fileHandler);
+//        fileHandler.setFormatter(new SimpleFormatter());
+//        logger.setUseParentHandlers(false);
+
         try {
             this.server = server;
             this.socket = socket;
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
-
             //new Thread(() -> {
             server.getExecutorService().execute(() -> {
                 try {
@@ -77,6 +91,7 @@ public class ClientHandler {
                                 server.privateMsg(this, token[1], token[2]);
                             }
                             if (str.startsWith("/chnick ")) {
+
                                 String[] token = str.split(" ", 2);
                                 if (token.length < 2) {
                                     continue;
@@ -88,6 +103,7 @@ public class ClientHandler {
                                 if (server.getAuthService().changeNick(this.nickname, token[1])) {
                                     sendMsg("/yournickis " + token[1]);
                                     sendMsg("Ваш ник изменен на " + token[1]);
+                                    //logger.info("Клиент сменил ник на " + token[1]);
                                     this.nickname = token[1];
                                     server.broadcastClientList();
                                 } else {
@@ -100,6 +116,7 @@ public class ClientHandler {
                             }
                         } else {
                             server.broadcastMsg(this, str);
+                            logger.info(nickname + " отправил сообщение" );
                         }
                     }
                 }catch (SocketTimeoutException e){
