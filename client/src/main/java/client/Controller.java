@@ -16,9 +16,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -51,6 +49,7 @@ public class Controller implements Initializable {
     private Stage stage;
     private Stage regStage;
     private RegController regController;
+    private BufferedWriter writer;
 
     public void setAuthenticated(boolean authenticated) {
         this.authenticated = authenticated;
@@ -126,6 +125,23 @@ public class Controller implements Initializable {
                         }
                     }
 
+                    //-----------------------------------------------------------------------------
+                    // Загружаем в чат историю переписки попутно проверяя существует ли файл
+                    String fileName = "history/history_" + loginField.getText().trim() + ".txt";
+                    File file = new File(fileName);
+                    if (file.exists()) {
+                        getHistory(fileName);
+                    }
+                    // Готовим файл к записи всех сообщений, которые будут добавлены в чат в блоке Цикл работы
+                    // Закрытие файла произойдет в блоке finally из Цикла работы
+                    try {
+                        writer = new BufferedWriter(new FileWriter(fileName,true));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    //OutputStreamWriter writeAppend = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(fileName)), StandardCharsets.UTF_8);
+                    //-----------------------------------------------------------------------------
+
                     //Цикл работы
                     while (true) {
                         String str = in.readUTF();
@@ -144,6 +160,7 @@ public class Controller implements Initializable {
                             }
                         } else {
                             textArea.appendText(str + "\n");
+                            writer.write(str + "\n");
                         }
                     }
                 } catch (RuntimeException e) {
@@ -152,6 +169,14 @@ public class Controller implements Initializable {
                     e.printStackTrace();
                 } finally {
                     setAuthenticated(false);
+                    try {
+                        writer.close();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                     try {
                         socket.close();
                     } catch (IOException e) {
@@ -222,7 +247,21 @@ public class Controller implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+    }
+    private void getHistory(String fileName) {
+        //закрытие буфера чтения происходит неявно в блоке try
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            String str;
+            int countLines = 0;
+            while ((str = reader.readLine()) != null && countLines != 100) {
+                textArea.appendText(str + "\n");
+                countLines++;
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML

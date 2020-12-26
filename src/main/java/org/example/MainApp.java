@@ -1,111 +1,62 @@
 package org.example;
 
-import java.sql.*;
+import java.io.IOException;
+import java.util.Arrays;
 
 public class MainApp {
-    private static Connection connection;
-    private static Statement stmt;
-    private static PreparedStatement psInsert;
 
-    public static void connect() throws ClassNotFoundException, SQLException {
-        Class.forName("org.sqlite.JDBC");
-        connection = DriverManager.getConnection("jdbc:sqlite:main.db");
-        stmt = connection.createStatement();
+    public static void main(String[] args){
+
+        // Проверки работы методов
+//        int[] arr = {0,2,3,4,5,4};
+//        for (int item:splitArray(arr)) {
+//            System.out.println(item);
+//        }
+//        int[] arr1 = { 1, 1, 1, 4, 4, 1, 4, 4 };    //-> true
+//        int[] arr2 = { 1, 1, 1, 1, 1, 1 };          //-> false
+//        int[] arr3 = { 4, 4, 4, 4 };                //-> false
+//        int[] arr4 = { 1, 4, 4, 1, 1, 4, 3 };       //-> false
+//        System.out.println(has1or4Array(arr));
+//        System.out.println(has1or4Array(arr1));
+//        System.out.println(has1or4Array(arr2));
+//        System.out.println(has1or4Array(arr3));
+//        System.out.println(has1or4Array(arr4));
+
+        DoingTest test = new DoingTest(MyTest.class);
+        //DoingTest test = new DoingTest("org.example.MyTest");
+        test.start();
+
     }
 
-    public static void main(String[] args) {
-        try {
-            connect();
-            //clearTable();
-            //exRollback();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            disconnect();
+// Метод, которому в качестве аргумента передается не пустой одномерный целочисленный массив.
+// Метод должен вернуть новый массив, который получен путем вытаскивания из исходного массива элементов, идущих после последней четверки.
+// Входной массив должен содержать хотя бы одну четверку, иначе в методе необходимо выбросить RuntimeException.
+    public static int[] splitArray(int[] myArray){
+        for(int i=myArray.length-1; i>=0; i--) {
+            if (myArray[i] == 4) {
+                return  Arrays.copyOfRange(myArray,i+1, myArray.length);
+            }
         }
+        throw new RuntimeException("Нет четверки");
     }
 
-    public static void exRollback() throws SQLException {
-        stmt.executeUpdate("INSERT INTO students (name, score) VALUES('Bob1', 65);");
-        Savepoint sp1 = connection.setSavepoint();
-
-        stmt.executeUpdate("INSERT INTO students (name, score) VALUES('Bob2', 65);");
-        connection.rollback(sp1);
-        stmt.executeUpdate("INSERT INTO students (name, score) VALUES('Bob3', 65);");
-        connection.commit();
-    }
-
-    public static void fillTableBatch() throws SQLException {
-        long begin = System.currentTimeMillis();
-        connection.setAutoCommit(false);
-        for (int i = 1; i <= 1000; i++) {
-            psInsert.setString(1, "Bob" + i);
-            psInsert.setInt(2, i * 15 % 100);
-            psInsert.addBatch();
+// Метод, который проверяет состав массива из чисел 1 и 4.
+// Если в нем нет хоть одной четверки или единицы, то метод вернет false;
+    public static boolean has1or4Array(int[] myArray){
+        boolean flag1 = false;
+        boolean flag2 = false;
+        for(int item:myArray) {
+            if (item != 4 && item != 1) {
+                return  false;
+            }
+            if (item == 1) {
+                flag1 = true;
+            }
+            if (item == 4) {
+                flag2 = true;
+            }
         }
-        psInsert.executeBatch();
-        connection.commit();
-        long end = System.currentTimeMillis();
-        System.out.printf("Time: %d ms", end - begin);
+        return (flag1 && flag2);
     }
-
-    public static void fillTable() throws SQLException {
-        long begin = System.currentTimeMillis();
-        connection.setAutoCommit(false);
-        for (int i = 1; i <= 10; i++) {
-            psInsert.setString(1, "Bob" + i);
-            psInsert.setInt(2, i * 15 % 100);
-            psInsert.executeUpdate();
-        }
-        connection.commit();
-        long end = System.currentTimeMillis();
-        System.out.printf("Time: %d ms", end - begin);
-    }
-
-    public static void prepareStatements() throws SQLException {
-        psInsert = connection.prepareStatement("INSERT INTO users (username, nikname) VALUES(?, ?);");
-    }
-
-    // CRUD create read update delete
-    public void exSelect() throws SQLException {
-        ResultSet rs = stmt.executeQuery("SELECT username, nikname FROM users WHERE id>1;");
-
-        while (rs.next()) {
-            System.out.println(rs.getString("name") + " " + rs.getInt("score"));
-        }
-
-        rs.close();
-    }
-
-    public static void clearTable() throws SQLException {
-        stmt.executeUpdate("DELETE FROM users;");
-    }
-
-    public void exDelete() throws SQLException {
-        stmt.executeUpdate("DELETE FROM users WHERE id=4;");
-    }
-
-    public void exUpdate() throws SQLException {
-        stmt.executeUpdate("UPDATE users SET nikname='test' WHERE id=2;");
-    }
-
-    public void exInsert1() throws SQLException {
-        stmt.executeUpdate("INSERT INTO students (name, score) VALUES('Bob4', 15), ('Bob5', 95),('Bob6', 75) ;");
-    }
-
-
-    public static void disconnect() {
-        try {
-            stmt.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        try {
-            connection.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-    }
-
 
 }

@@ -1,6 +1,5 @@
 package server;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +37,6 @@ public class SimpleAuthService implements AuthService {
         }
     }
 
-
     @Override
     public String getNicknameByLoginAndPassword(String login, String password) {
         for (UserData user : users) {
@@ -63,7 +61,20 @@ public class SimpleAuthService implements AuthService {
 
     @Override
     public boolean changeNick(String oldNickname, String newNickname) {
-        if (SQLHandler.changeNick(oldNickname, newNickname)) return true;
-        else return false;
+
+        if (SQLHandler.changeNick(oldNickname, newNickname)) {
+            for (UserData user : users) {
+                if(user.nickname.equals(oldNickname)){
+                    user.nickname = newNickname;
+                }
+            }
+            return true;
+        }
+        else {
+            return false;
+        }
+
+
+
     }
 }

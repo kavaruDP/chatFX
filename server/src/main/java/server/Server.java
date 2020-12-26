@@ -5,8 +5,13 @@ package server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.*;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class Server {
     private ServerSocket server;
@@ -14,23 +19,42 @@ public class Server {
     private final int PORT = 8189;
     private List<ClientHandler> clients;
     private AuthService authService;
+    private ExecutorService executorService;
+    private static final Logger logger = Logger.getLogger(Server.class.getName());
 
-    public Server()  {
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
+
+    public Server() {
         clients = new CopyOnWriteArrayList<>();
-        if (!SQLHandler.connect()) {
-            SQLHandler.isAuthDBmethodOK = false;
+        executorService = Executors.newCachedThreadPool();
 
+//        Handler fileHandler = null;
+//        try {
+//            fileHandler = new FileHandler("logs/server.log",true);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        logger.addHandler(fileHandler);
+//        fileHandler.setFormatter(new SimpleFormatter());
+//        logger.setUseParentHandlers(false);
+
+        if (!SQLHandler.connect()) {
+            logger.severe("Не удалось подключиться к БД");
             throw new RuntimeException("Не удалось подключиться к БД");
         }
+        //Видоизмененный метод с возможностью начитывать данные из БД и обновлять в ней ник.
         authService = new SimpleAuthService();
 //        authService = new DBAuthService();
         try {
             server = new ServerSocket(PORT);
-            System.out.println("server started!");
-
+            //System.out.println("server started!");
+            logger.info("server started!");
             while (true) {
                 socket = server.accept();
-                System.out.println("client connected " + socket.getRemoteSocketAddress());
+                //System.out.println("client connected " + socket.getRemoteSocketAddress());
+                logger.info("client connected " + socket.getRemoteSocketAddress());
                 new ClientHandler(this, socket);
             }
 
@@ -38,7 +62,9 @@ public class Server {
             e.printStackTrace();
         } finally {
             SQLHandler.disconnect();
-            System.out.println("server closed");
+            //System.out.println("server closed");
+            logger.info("server closed");
+            executorService.shutdown();
             try {
                 server.close();
             } catch (IOException e) {
