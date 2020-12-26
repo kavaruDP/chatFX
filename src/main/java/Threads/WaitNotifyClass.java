@@ -1,4 +1,4 @@
-package org.example;
+package Threads;
 
 public class WaitNotifyClass {
     private final Object mon = new Object();

@@ -1,4 +1,4 @@
-package org.example;
+package Threads;
 
 public class RunnableDemo {
     static class RunnableClass implements Runnable {

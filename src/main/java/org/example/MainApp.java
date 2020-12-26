@@ -5,13 +5,13 @@ import java.util.Arrays;
 
 public class MainApp {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args){
 
         // Проверки работы методов
-        int[] arr = {0,2,3,4,5,4};
-        for (int item:splitArray(arr)) {
-            System.out.println(item);
-        }
+//        int[] arr = {0,2,3,4,5,4};
+//        for (int item:splitArray(arr)) {
+//            System.out.println(item);
+//        }
 //        int[] arr1 = { 1, 1, 1, 4, 4, 1, 4, 4 };    //-> true
 //        int[] arr2 = { 1, 1, 1, 1, 1, 1 };          //-> false
 //        int[] arr3 = { 4, 4, 4, 4 };                //-> false
@@ -22,7 +22,12 @@ public class MainApp {
 //        System.out.println(has1or4Array(arr3));
 //        System.out.println(has1or4Array(arr4));
 
+        DoingTest test = new DoingTest(MyTest.class);
+        //DoingTest test = new DoingTest("org.example.MyTest");
+        test.start();
+
     }
+
 // Метод, которому в качестве аргумента передается не пустой одномерный целочисленный массив.
 // Метод должен вернуть новый массив, который получен путем вытаскивания из исходного массива элементов, идущих после последней четверки.
 // Входной массив должен содержать хотя бы одну четверку, иначе в методе необходимо выбросить RuntimeException.
